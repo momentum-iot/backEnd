@@ -13,13 +13,13 @@ import com.example.gymadmin.repo.UserRepo;
 import com.example.gymadmin.security.JwtTokenService;
 
 @Service
-public class UserService {
+public class AuthService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
 
-    public UserService(UserRepo userRepo,
+    public AuthService(UserRepo userRepo,
                        PasswordEncoder passwordEncoder,
                        JwtTokenService jwtTokenService) {
         this.userRepo = userRepo;
