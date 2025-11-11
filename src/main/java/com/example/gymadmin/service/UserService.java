@@ -1,46 +1,61 @@
 package com.example.gymadmin.service;
 
-import com.example.gymadmin.model.User;
-import com.example.gymadmin.repo.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.example.gymadmin.dto.AuthResponse;
+import com.example.gymadmin.dto.LoginRequest;
+import com.example.gymadmin.model.Role;
+import com.example.gymadmin.model.User;
+import com.example.gymadmin.repo.UserRepo;
+import com.example.gymadmin.security.JwtTokenService;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public UserService(UserRepo userRepo,
+                       PasswordEncoder passwordEncoder,
+                       JwtTokenService jwtTokenService) {
+        this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenService = jwtTokenService;
+    }
 
-    public User register(User user) {
-        
+    public AuthResponse register(User user) {
         if (userRepo.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already registered");
         }
-        
-        
+
+        if (user.getRole() == null) {
+            user.setRole(Role.USER);
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepo.save(user);
+        User saved = userRepo.save(user);
+        return new AuthResponse(
+                jwtTokenService.generateToken(saved),
+                jwtTokenService.getExpirationSeconds(),
+                saved);
     }
 
-    public Optional<User> login(String email, String password) {
-        Optional<User> userOpt = userRepo.findByEmail(email);
-        
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (passwordEncoder.matches(password, user.getPassword())) {
-                // No devolver la contraseña
-                user.setPassword(null);
-                return Optional.of(user);
-            }
+    public AuthResponse login(LoginRequest loginRequest) {
+        User user = userRepo.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
         }
-        
-        return Optional.empty();
+
+        return new AuthResponse(
+                jwtTokenService.generateToken(user),
+                jwtTokenService.getExpirationSeconds(),
+                user);
     }
 
     public Optional<User> getById(Long id) {
