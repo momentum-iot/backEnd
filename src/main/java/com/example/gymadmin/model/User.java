@@ -31,12 +31,16 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
     public User() {
     }
 
  
     public User(Long id, String name, String lastName, String phone, String gender,
-            int age, String email, String password) {
+            int age, String email, String password, Role role) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -45,6 +49,7 @@ public class User {
         this.age = age;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
 
@@ -110,5 +115,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
