@@ -20,17 +20,32 @@ public class JwtTokenService {
 
     private final byte[] secret;
     private final long expirationMs;
+    private final long refreshExpirationMs;
 
     public JwtTokenService(
             @Value("${app.jwt.secret}") String secret,
             @Value("${app.jwt.expiration-ms}") long expirationMs) {
         this.secret = secret.getBytes(StandardCharsets.UTF_8);
         this.expirationMs = expirationMs;
+        this.refreshExpirationMs = 7 * 24 * 60 * 60 * 1000;
     }
 
     public String generateToken(User user) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
+
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .claim("role", user.getRole().name())
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(Keys.hmacShaKeyFor(secret))
+                .compact();
+    }
+
+    public String generateRefreshToken(User user) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + refreshExpirationMs);
 
         return Jwts.builder()
                 .subject(user.getEmail())

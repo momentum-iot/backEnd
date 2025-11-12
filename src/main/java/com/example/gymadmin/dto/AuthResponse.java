@@ -4,14 +4,16 @@ import com.example.gymadmin.model.User;
 
 public class AuthResponse {
     private String token;
+    private String refreshToken;
     private long expiresIn;
     private User user;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, long expiresIn, User user) {
+    public AuthResponse(String token, String refreshToken, long expiresIn, User user) {
         this.token = token;
+        this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
         this.user = user;
     }
@@ -22,6 +24,14 @@ public class AuthResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public long getExpiresIn() {

@@ -20,8 +20,8 @@ public class AuthService {
     private final JwtTokenService jwtTokenService;
 
     public AuthService(UserRepo userRepo,
-                       PasswordEncoder passwordEncoder,
-                       JwtTokenService jwtTokenService) {
+            PasswordEncoder passwordEncoder,
+            JwtTokenService jwtTokenService) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenService = jwtTokenService;
@@ -38,8 +38,16 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User saved = userRepo.save(user);
+
+        String accessToken = jwtTokenService.generateToken(saved);
+        String refreshToken = jwtTokenService.generateRefreshToken(saved);
+
+        saved.setRefreshToken(refreshToken);
+        userRepo.save(saved);
+
         return new AuthResponse(
-                jwtTokenService.generateToken(saved),
+                accessToken,
+                refreshToken,
                 jwtTokenService.getExpirationSeconds(),
                 saved);
     }
@@ -52,8 +60,49 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid email or password");
         }
 
+        String accessToken = jwtTokenService.generateToken(user);
+        String refreshToken = jwtTokenService.generateRefreshToken(user);
+
+        user.setRefreshToken(refreshToken);
+        userRepo.save(user);
+
         return new AuthResponse(
-                jwtTokenService.generateToken(user),
+                accessToken,
+                refreshToken,
+                jwtTokenService.getExpirationSeconds(),
+                user);
+    }
+
+    public AuthResponse refresh(String refreshToken) {
+        
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new IllegalArgumentException("Refresh token is required");
+        }
+
+        
+        if (!jwtTokenService.isTokenValid(refreshToken)) {
+            throw new IllegalArgumentException("Invalid or expired refresh token");
+        }
+
+        
+        String email = jwtTokenService.extractEmail(refreshToken);
+
+        
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        
+        String newAccessToken = jwtTokenService.generateToken(user);
+        String newRefreshToken = jwtTokenService.generateRefreshToken(user);
+
+       
+        user.setRefreshToken(newRefreshToken);
+        userRepo.save(user);
+
+        
+        return new AuthResponse(
+                newAccessToken,
+                newRefreshToken,
                 jwtTokenService.getExpirationSeconds(),
                 user);
     }

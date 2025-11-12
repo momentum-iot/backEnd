@@ -5,7 +5,6 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -50,23 +49,28 @@ public class User {
 
     private LocalDate birthday;
     private String emergencyContact;
-    private Integer height; 
-    private Double weight; 
+    private Integer height;
+    private Double weight;
     private String avatar;
+
+    @Column(length = 512)
+    private String refreshToken;
 
     @PrePersist
     protected void onCreate() {
-        if (joinDate == null) this.joinDate = LocalDate.now();
-        if (joinHour == null) this.joinHour = LocalTime.now();
-        if (role == null) this.role = Role.USER;
+        if (joinDate == null)
+            this.joinDate = LocalDate.now();
+        if (joinHour == null)
+            this.joinHour = LocalTime.now();
+        if (role == null)
+            this.role = Role.USER;
     }
 
     public User() {
     }
 
- 
     public User(Long id, String name, String lastName, String phone, String gender, int age,
-                String email, String password, Role role) {
+            String email, String password, Role role) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -77,7 +81,6 @@ public class User {
         this.password = password;
         this.role = role;
     }
-
 
     public Long getId() {
         return id;
@@ -221,5 +224,13 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
