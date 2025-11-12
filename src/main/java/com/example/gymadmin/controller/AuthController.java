@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.gymadmin.dto.AuthResponse;
 import com.example.gymadmin.dto.LoginRequest;
+import com.example.gymadmin.dto.LogoutRequest;
 import com.example.gymadmin.model.User;
 import com.example.gymadmin.service.AuthService;
 
@@ -77,4 +78,22 @@ public class AuthController {
         return user.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getProfile() {
+        try {
+            User currentUser = authService.getCurrentUser();
+            return ResponseEntity.ok(currentUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody LogoutRequest request) {
+        authService.logout(request.getRefreshToken());
+        return ResponseEntity.ok("Logout successful");
+    }
+
 }

@@ -3,6 +3,7 @@ package com.example.gymadmin.service;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.gymadmin.dto.AuthResponse;
@@ -73,38 +74,62 @@ public class AuthService {
                 user);
     }
 
+    public void logout(String refreshToken) {
+    if (refreshToken == null || refreshToken.isEmpty()) {
+        throw new IllegalArgumentException("Refresh token is required");
+    }
+
+    if (!jwtTokenService.isTokenValid(refreshToken)) {
+        throw new IllegalArgumentException("Invalid or expired refresh token");
+    }
+
+    String email = jwtTokenService.extractEmail(refreshToken);
+
+    User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    user.setRefreshToken(null);
+    userRepo.save(user);
+}
+
     public AuthResponse refresh(String refreshToken) {
-        
+
         if (refreshToken == null || refreshToken.isEmpty()) {
             throw new IllegalArgumentException("Refresh token is required");
         }
 
-        
         if (!jwtTokenService.isTokenValid(refreshToken)) {
             throw new IllegalArgumentException("Invalid or expired refresh token");
         }
 
-        
         String email = jwtTokenService.extractEmail(refreshToken);
 
-        
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        
         String newAccessToken = jwtTokenService.generateToken(user);
         String newRefreshToken = jwtTokenService.generateRefreshToken(user);
 
-       
         user.setRefreshToken(newRefreshToken);
         userRepo.save(user);
 
-        
         return new AuthResponse(
                 newAccessToken,
                 newRefreshToken,
                 jwtTokenService.getExpirationSeconds(),
                 user);
+    }
+
+    public User getCurrentUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalArgumentException("No authenticated user found");
+        }
+
+        String email = authentication.getName();
+
+        return userRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     public Optional<User> getById(Long id) {
