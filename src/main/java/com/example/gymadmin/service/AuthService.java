@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.gymadmin.dto.AuthResponse;
 import com.example.gymadmin.dto.LoginRequest;
+import com.example.gymadmin.model.Membership;
 import com.example.gymadmin.model.Role;
+import com.example.gymadmin.model.Status;
 import com.example.gymadmin.model.User;
 import com.example.gymadmin.repo.UserRepo;
 import com.example.gymadmin.security.JwtTokenService;
@@ -35,6 +37,13 @@ public class AuthService {
 
         if (user.getRole() == null) {
             user.setRole(Role.USER);
+        }
+
+        if (user.getStatus() == null) {
+            user.setStatus(Status.ACTIVO);
+        }
+        if (user.getMembership() == null) {
+            user.setMembership(Membership.BASICO);
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

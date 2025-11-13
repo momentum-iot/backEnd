@@ -31,12 +31,7 @@ public class UserService {
     }
 
     public User save(User user) {
-        if (user.getStatus() == null) {
-            user.setStatus(Status.ACTIVO);
-        }
-        if (user.getMembership() == null) {
-            user.setMembership(Membership.BASICO);
-        }
+        
         return userRepo.save(user);
     }
 
