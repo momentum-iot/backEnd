@@ -14,7 +14,7 @@ import java.util.List;
 public class DataLoader {
 
     @Bean
-    CommandLineRunner seed(UserRepo userRepo, PlanRepo planRepo, CheckInRepo checkInRepo, PaymentRepo paymentRepo,
+    CommandLineRunner seed(UserRepo userRepo, PlanRepo planRepo, PaymentRepo paymentRepo,
                            EquipmentRepo equipmentRepo) {
         return args -> {
             // === Planes ===
@@ -51,15 +51,6 @@ public class DataLoader {
 
                 userRepo.saveAll(List.of(u1, u2, u3, u4));
                 userRepo.saveAll(extra);
-
-                // === Check-ins ===
-                checkInRepo.saveAll(List.of(
-                        ci(u1, "2025-10-06T06:50:00-05:00"),
-                        ci(u2, "2025-10-05T19:12:00-05:00"),
-                        ci(u3, "2025-10-05T17:44:00-05:00"),
-                        ci(extra.get(0), "2025-10-06T09:10:00-05:00"),
-                        ci(extra.get(1), "2025-10-06T10:22:00-05:00")
-                ));
 
                 // === Pagos ===
                 Payment p1 = new Payment();
@@ -116,13 +107,5 @@ public class DataLoader {
                 (int) (Math.random() * 90) + ".jpg");
         u.setPassword("123456"); // 🔒 Contraseña por defecto para evitar error de validación
         return u;
-    }
-
-    // 🔹 Helper para crear check-ins
-    private CheckIn ci(User user, String ts) {
-        CheckIn c = new CheckIn();
-        c.setUser(user);
-        c.setTimestamp(OffsetDateTime.parse(ts));
-        return c;
     }
 }
