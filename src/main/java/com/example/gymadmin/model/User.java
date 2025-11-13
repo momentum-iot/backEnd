@@ -39,7 +39,10 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @Enumerated(EnumType.STRING)
     private Membership membership;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
