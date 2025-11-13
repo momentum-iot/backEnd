@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.example.gymadmin.model.Membership;
 import com.example.gymadmin.model.Status;
 import com.example.gymadmin.model.User;
-import com.example.gymadmin.repo.CheckInRepo;
 import com.example.gymadmin.repo.PaymentRepo;
 import com.example.gymadmin.repo.UserRepo;
 
@@ -16,12 +15,11 @@ public class UserService {
 
     private final UserRepo userRepo;
     private final PaymentRepo paymentRepo;
-    private final CheckInRepo checkInRepo;
 
-    public UserService (UserRepo userRepo, PaymentRepo paymentRepo, CheckInRepo checkInRepo) {
+    public UserService (UserRepo userRepo, PaymentRepo paymentRepo) {
         this.userRepo = userRepo;
         this.paymentRepo = paymentRepo;
-        this.checkInRepo = checkInRepo;
+        
     }
 
     public List<User> list() {
@@ -50,10 +48,7 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        checkInRepo.deleteByUser(user);
         paymentRepo.deleteByUser(user);
-
-
         
         userRepo.delete(user);
     }
