@@ -3,6 +3,8 @@ package com.example.gymadmin.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.example.gymadmin.model.Membership;
 import com.example.gymadmin.model.Status;
 import com.example.gymadmin.model.User;
@@ -11,6 +13,7 @@ import com.example.gymadmin.repo.UserRepo;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class UserService {
 
     private final UserRepo userRepo;
