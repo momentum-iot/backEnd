@@ -73,7 +73,7 @@ public class PaymentService {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(request.getSuccessUrl() + "?session_id={CHECKOUT_SESSION_ID}")
+                .setSuccessUrl(request.getSuccessUrl() + "?session_id={CHECKOUT_SESSION_ID}&success=true")
                 .setCancelUrl(request.getCancelUrl())
                 .setCustomerEmail(user.getEmail())
                 .addLineItem(
@@ -102,6 +102,7 @@ public class PaymentService {
         payment.setCurrency(request.getCurrency());
         payment.setCheckoutSessionId(session.getId());
         payment.setPaymentStatus(PaymentStatus.PENDIENTE);
+        payment.setTargetMembership(request.getTargetMembership());
         payment.setDueDate(LocalDate.now());
         paymentRepo.save(payment);
 
@@ -133,8 +134,11 @@ public class PaymentService {
         paymentRepo.save(payment);
 
         boolean membershipUpdated = false;
-        if (user.getMembership() != Membership.PREMIUM) {
-            user.setMembership(Membership.PREMIUM);
+        Membership target = payment.getTargetMembership() != null
+                ? payment.getTargetMembership()
+                : Membership.PREMIUM;
+        if (user.getMembership() != target) {
+            user.setMembership(target);
             userRepo.save(user);
             membershipUpdated = true;
         }

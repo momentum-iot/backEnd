@@ -22,6 +22,9 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus; 
+    
+    @Enumerated(EnumType.STRING)
+    private Membership targetMembership;
 
     public String getId() {
         return id;
@@ -77,5 +80,13 @@ public class Payment {
 
     public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public Membership getTargetMembership() {
+        return targetMembership;
+    }
+
+    public void setTargetMembership(Membership targetMembership) {
+        this.targetMembership = targetMembership;
     }
 }
