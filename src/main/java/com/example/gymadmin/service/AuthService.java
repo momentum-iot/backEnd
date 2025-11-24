@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.gymadmin.dto.AuthResponse;
 import com.example.gymadmin.dto.LoginRequest;
+import com.example.gymadmin.dto.RegisterRequest;
 import com.example.gymadmin.model.Membership;
 import com.example.gymadmin.model.Role;
 import com.example.gymadmin.model.Status;
@@ -30,10 +31,28 @@ public class AuthService {
         this.jwtTokenService = jwtTokenService;
     }
 
-    public AuthResponse register(User user) {
-        if (userRepo.findByEmail(user.getEmail()).isPresent()) {
+    public AuthResponse register(RegisterRequest registerRequest) {
+        if (userRepo.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already registered");
         }
+
+        User user = new User();
+        user.setName(registerRequest.getName());
+        user.setLastName(registerRequest.getLastName());
+        user.setPhone(registerRequest.getPhone());
+        user.setGender(registerRequest.getGender());
+        user.setAge(registerRequest.getAge() != null ? registerRequest.getAge() : 0);
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(registerRequest.getPassword());
+        user.setRole(registerRequest.getRole());
+        user.setMembership(registerRequest.getMembership());
+        user.setStatus(registerRequest.getStatus());
+        user.setJoinDate(registerRequest.getJoinDate());
+        user.setBirthday(registerRequest.getBirthday());
+        user.setEmergencyContact(registerRequest.getEmergencyContact());
+        user.setHeight(registerRequest.getHeight());
+        user.setWeight(registerRequest.getWeight());
+        user.setAvatar(registerRequest.getAvatar());
 
         if (user.getRole() == null) {
             user.setRole(Role.USER);

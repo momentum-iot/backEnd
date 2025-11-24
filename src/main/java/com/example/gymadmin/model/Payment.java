@@ -15,7 +15,16 @@ public class Payment {
 
     private LocalDate dueDate;
     private Double amount;
+    private String currency;
+
+    @Column(unique = true)
+    private String checkoutSessionId;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus; 
+    
+    @Enumerated(EnumType.STRING)
+    private Membership targetMembership;
 
     public String getId() {
         return id;
@@ -49,11 +58,35 @@ public class Payment {
         this.amount = amount;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getCheckoutSessionId() {
+        return checkoutSessionId;
+    }
+
+    public void setCheckoutSessionId(String checkoutSessionId) {
+        this.checkoutSessionId = checkoutSessionId;
+    }
+
     public PaymentStatus getPaymentStatus() {
         return paymentStatus;
     }
 
     public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public Membership getTargetMembership() {
+        return targetMembership;
+    }
+
+    public void setTargetMembership(Membership targetMembership) {
+        this.targetMembership = targetMembership;
     }
 }
