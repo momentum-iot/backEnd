@@ -15,6 +15,12 @@ public class Payment {
 
     private LocalDate dueDate;
     private Double amount;
+    private String currency;
+
+    @Column(unique = true)
+    private String checkoutSessionId;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus; 
 
     public String getId() {
@@ -47,6 +53,22 @@ public class Payment {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getCheckoutSessionId() {
+        return checkoutSessionId;
+    }
+
+    public void setCheckoutSessionId(String checkoutSessionId) {
+        this.checkoutSessionId = checkoutSessionId;
     }
 
     public PaymentStatus getPaymentStatus() {
