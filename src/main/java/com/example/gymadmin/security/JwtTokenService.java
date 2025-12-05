@@ -26,6 +26,9 @@ public class JwtTokenService {
             @Value("${app.jwt.secret}") String secret,
             @Value("${app.jwt.expiration-ms}") long expirationMs) {
         this.secret = secret.getBytes(StandardCharsets.UTF_8);
+        if (this.secret.length < 32) {
+            throw new IllegalArgumentException("app.jwt.secret must be at least 32 bytes (256 bits)");
+        }
         this.expirationMs = expirationMs;
         this.refreshExpirationMs = 7 * 24 * 60 * 60 * 1000;
     }

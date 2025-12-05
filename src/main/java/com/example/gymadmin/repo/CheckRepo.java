@@ -8,6 +8,7 @@ import com.example.gymadmin.model.Check;
 import com.example.gymadmin.model.CheckStatus;
 
 public interface CheckRepo extends JpaRepository<Check, String> {
+    Optional<Check> findByAccessCodeAndStatus(String accessCode, CheckStatus status);
     Optional<Check> findByUserIdAndStatus(Long userId, CheckStatus status);
 
     long countByStatus(CheckStatus status);

@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "checks")
@@ -30,6 +31,9 @@ public class Check {
 
     @Enumerated(EnumType.STRING)
     private CheckStatus status;
+
+    @Column(name = "access_code", length = 64)
+    private String accessCode;
 
     public String getId() {
         return id;
@@ -69,6 +73,14 @@ public class Check {
 
     public void setStatus(CheckStatus status) {
         this.status = status;
+    }
+
+    public String getAccessCode() {
+        return accessCode;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
     }
     
 }

@@ -16,20 +16,26 @@ public class CheckService {
     private final CheckRepo checkRepo;
     private final UserRepo userRepo;
 
-    public CheckService(CheckRepo checkRepo, UserRepo userRepo) {
+    public CheckService(
+            CheckRepo checkRepo,
+            UserRepo userRepo) {
         this.checkRepo = checkRepo;
         this.userRepo = userRepo;
     }
 
     private User getLoggedUser() {
-    String email = SecurityContextHolder.getContext().getAuthentication().getName();
-    return userRepo.findByEmail(email).orElseThrow();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepo.findByEmail(email).orElseThrow();
     }
 
-    public String checkIn() {
+    public String checkIn(String code) {
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Código de acceso requerido");
+        }
+
         User user = getLoggedUser();
 
-        var activeCheck = checkRepo.findByUserIdAndStatus(user.getId(), CheckStatus.ACTIVE);
+        var activeCheck = checkRepo.findByAccessCodeAndStatus(code.trim(), CheckStatus.ACTIVE);
         if (activeCheck.isPresent()) {
             return "Ya estás dentro del gimnasio";
         }
@@ -38,16 +44,21 @@ public class CheckService {
         check.setUser(user);
         check.setCheckInTime(OffsetDateTime.now());
         check.setStatus(CheckStatus.ACTIVE);
+        check.setAccessCode(code.trim());
 
         checkRepo.save(check);
 
         return "Check-in registrado";
     }
 
-    public String checkOut() {
+    public String checkOut(String code) {
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Código de acceso requerido");
+        }
+
         User user = getLoggedUser();
 
-        var activeCheck = checkRepo.findByUserIdAndStatus(user.getId(), CheckStatus.ACTIVE)
+        var activeCheck = checkRepo.findByAccessCodeAndStatus(code.trim(), CheckStatus.ACTIVE)
                 .orElse(null);
 
         if (activeCheck == null) {
@@ -56,6 +67,7 @@ public class CheckService {
 
         activeCheck.setCheckOutTime(OffsetDateTime.now());
         activeCheck.setStatus(CheckStatus.ENDED);
+        activeCheck.setAccessCode(code.trim());
 
         checkRepo.save(activeCheck);
         return "Check-out registrado";
